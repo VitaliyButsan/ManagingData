@@ -3,11 +3,12 @@
 //  ManagingData
 //
 //  Created by vit on 10/5/18.
-//  Copyright © 2018 vit. All rights reserved.
 //
+// SOURCE ORIGINAL PROJECT -- https://github.com/sitepoint-editors/SQLiteApp
+
+
 
 import UIKit
-import SQLite3
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var nameTextField: UITextField!
@@ -21,7 +22,46 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        contacts = StephencelisDB.instance.getContacts()
     }
+    
+    @IBAction func addButtonClicked() {
+        let name = nameTextField.text ?? ""
+        let phone = phoneTextField.text ?? ""
+        let address = addressTextField.text ?? ""
+        
+        if StephencelisDB.instance.addContact(cname: name, cphone: phone, caddress: address) != nil {
+            let contact = Contact(id: 0, name: name, phone: phone, address: address)
+            contacts.append(contact)
+            let indexPath = IndexPath(row: contacts.count-1, section: 0)
+            contactsTabelView.insertRows(at: [indexPath], with: .left)
+        }
+    }
+
+    @IBAction func updateButtonClicked() {
+        if selectedContact != nil {
+                let id = contacts[selectedContact!].id!
+                let contact = Contact(id: id, name: nameTextField.text ?? "", phone: phoneTextField.text ?? "", address: addressTextField.text ?? "")
+                StephencelisDB.instance.updateContact(cid: id, newContact: contact)
+                contacts.remove(at: selectedContact!)
+                contacts.insert(contact, at: selectedContact!)
+                contactsTabelView.reloadData()
+        } else {
+            print("No item selected")
+        }
+    }
+    
+    @IBAction func deleteButtonClicked() {
+        if selectedContact != nil {
+            StephencelisDB.instance.deleteContact(cid: contacts[selectedContact!].id!)
+            contacts.remove(at: selectedContact!)
+            let indexPath = IndexPath(row: selectedContact!, section: 0)
+            contactsTabelView.deleteRows(at: [indexPath], with: .fade)
+        } else {
+            print("No item selected")
+        }
+    }
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         nameTextField.text = contacts[indexPath.row].name
@@ -46,40 +86,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return cell
     }
     
-    @IBAction func addButtonClicked() {
-        let name = nameTextField.text ?? ""
-        let phone = phoneTextField.text ?? ""
-        let address = addressTextField.text ?? ""
-        
-        let contact = Contact(id: 0, name: name, phone: phone, address: address)
-        contacts.append(contact)
-        let indexPath = IndexPath(row: contacts.count-1, section: 0)
-        contactsTabelView.insertRows(at: [indexPath], with: .fade)
-    }
 
-    @IBAction func updateButtonClicked() {
-        if selectedContact != nil {
-            let id = contacts[selectedContact!].id!
-            let contact = Contact(id: id, name: nameTextField.text ?? "", phone: phoneTextField.text ?? "", address: addressTextField.text ?? "")
-            contacts.remove(at: selectedContact!)
-            contacts.insert(contact, at: selectedContact!)
-            contactsTabelView.reloadData()
-        } else {
-            print("No item selected")
-        }
-    }
-    
-    @IBAction func deleteButtonClicked() {
-        if selectedContact != nil {
-            contacts.remove(at: selectedContact!)
-            let indexPath = IndexPath(row: selectedContact!, section: 0)
-            contactsTabelView.deleteRows(at: [indexPath], with: .fade)
-        } else {
-            print("No item selected")
-        }
-    }
-    
-    
     
     
     
