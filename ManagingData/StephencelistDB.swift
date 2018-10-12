@@ -4,7 +4,7 @@
 //
 //  Created by deivitaka on 3/28/16.
 //
-//
+//  SQLite.swift Documentation https://github.com/stephencelis/SQLite.swift/blob/master/Documentation/Index.md#sqliteswift-documentation
 
 import SQLite
 
@@ -16,7 +16,9 @@ class StephencelisDB {
     private let phone = Expression<String>("phone")
     private let address = Expression<String>("address")
     
+    // singleton
     static let instance = StephencelisDB()
+    // creation the object "db" to connection with db farther
     private let db: Connection?
     
     private init() {
@@ -49,7 +51,6 @@ class StephencelisDB {
     
     func addContact(cname: String, cphone: String, caddress: String) -> Int64? {
         do {
-            print("addCantact")
             let insert = contacts.insert(name <- cname, phone <- cphone, address <- caddress)
             let id = try db!.run(insert)
                 print(insert.asSQL())
